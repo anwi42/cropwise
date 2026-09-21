@@ -1,0 +1,11 @@
+INFO:     Started server process [18556]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8010 (Press CTRL+C to quit)
+INFO:     127.0.0.1:59243 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59257 - "POST /api/yield/predict HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59332 - "POST /api/yield/predict HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59344 - "POST /api/yield/predict HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:59345 - "POST /api/yield/predict HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:59359 - "POST /api/register HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59361 - "POST /api/yield/predict HTTP/1.1" 404 Not Found
