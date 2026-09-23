@@ -21,7 +21,7 @@ def get_yield_models() -> dict:
     return joblib.load(MODEL_PATH)
 
 
-def predict_yield(feature_values: list) -> dict:
+def predict_yield(feature_values: list, crop_range: tuple[float, float] | None = None) -> dict:
     bundle = get_yield_models()
     models = bundle["models"]
     row = [feature_values]
@@ -29,6 +29,16 @@ def predict_yield(feature_values: list) -> dict:
     low = float(models["low"].predict(row)[0])
     median = float(models["median"].predict(row)[0])
     high = float(models["high"].predict(row)[0])
+
+    if crop_range is not None:
+        # A single regressor is shared across every crop, whose realistic yields span
+        # ~0.1-30 tons/acre. Clamp to the same bounds used when generating this crop's
+        # training data so the model can't report yields far outside a plausible range.
+        base_low, base_high = crop_range
+        clamp_low, clamp_high = base_low * 0.5, base_high * 1.1
+        low = max(clamp_low, min(clamp_high, low))
+        median = max(clamp_low, min(clamp_high, median))
+        high = max(clamp_low, min(clamp_high, high))
 
     if low > median:
         low = median

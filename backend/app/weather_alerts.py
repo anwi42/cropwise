@@ -86,7 +86,7 @@ def _load_farmers_with_active_crop(cur) -> list:
         SELECT f.id AS farmer_id, f.district, d.latitude, d.longitude,
                yp.crop_type, yp.sowing_date
         FROM farmers f
-        JOIN districts d ON d.district_name = f.district
+        JOIN districts d ON LOWER(d.district_name) = LOWER(f.district)
         LEFT JOIN LATERAL (
             SELECT crop_type, sowing_date
             FROM yield_predictions

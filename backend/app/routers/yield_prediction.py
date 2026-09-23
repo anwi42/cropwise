@@ -1,11 +1,13 @@
 from fastapi import APIRouter, HTTPException
 
 from app.crop_config import CROP_WEATHER_RANGES, SEASON_ENCODING
+from app.crop_traits import encode_traits
 from app.database import get_db_cursor
 from app.schemas import YieldPredictRequest, YieldPredictResponse
 from app.soil_scoring import compute_soil_health, score_nutrient
 from app.weather import fetch_yield_weather
 from app.yield_config import (
+    BASE_YIELD_RANGE_TONS_PER_ACRE,
     CROP_ENCODING,
     FEATURE_ORDER,
     HUMIDITY_RANGE_BY_SEASON,
@@ -67,7 +69,7 @@ def predict(payload: YieldPredictRequest):
         farm_size = float(farm["farm_size"]) if farm["farm_size"] is not None else DEFAULT_FARM_SIZE_ACRES
 
         cur.execute(
-            "SELECT latitude, longitude FROM districts WHERE district_name = %s",
+            "SELECT latitude, longitude FROM districts WHERE LOWER(district_name) = LOWER(%s)",
             (farmer["district"],),
         )
         district_row = cur.fetchone()
@@ -155,9 +157,12 @@ def predict(payload: YieldPredictRequest):
             "sowing_day_of_year": payload.sowing_date.timetuple().tm_yday,
             "season": SEASON_ENCODING[season],
         }
+        feature_values_by_name.update(encode_traits(payload.crop_type))
         feature_values = [feature_values_by_name[name] for name in FEATURE_ORDER]
 
-        prediction = predict_yield(feature_values)
+        prediction = predict_yield(
+            feature_values, crop_range=BASE_YIELD_RANGE_TONS_PER_ACRE.get(payload.crop_type)
+        )
 
         message = (
             f"Predicted yield for {payload.crop_type} ({payload.crop_variety}) sown on "

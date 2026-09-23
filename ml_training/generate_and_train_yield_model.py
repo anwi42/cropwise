@@ -13,6 +13,7 @@ from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
 
 from app.crop_config import CROP_SEASONS, CROP_WEATHER_RANGES, SEASON_ENCODING
+from app.crop_traits import encode_traits
 from app.database import get_db_cursor
 from app.soil_scoring import score_nutrient
 from app.yield_config import (
@@ -120,24 +121,24 @@ def generate_training_rows(standards: dict, rng: np.random.Generator) -> pd.Data
                 target_yield += float(rng.normal(0, (base_high - base_low) * 0.04))
                 target_yield = max(base_low * 0.5, min(base_high * 1.1, target_yield))
 
-                records.append(
-                    {
-                        "nitrogen": nitrogen,
-                        "phosphorus": phosphorus,
-                        "potassium": potassium,
-                        "ph": ph,
-                        "organic_carbon": organic_carbon,
-                        "soil_type": SOIL_TYPE_ENCODING[soil_type],
-                        "farm_size": farm_size,
-                        "rainfall": rainfall,
-                        "avg_temperature": temperature,
-                        "avg_humidity": humidity,
-                        "crop": CROP_ENCODING[crop],
-                        "sowing_day_of_year": sowing_doy,
-                        "season": SEASON_ENCODING[season],
-                        "yield_tons_per_acre": target_yield,
-                    }
-                )
+                record = {
+                    "nitrogen": nitrogen,
+                    "phosphorus": phosphorus,
+                    "potassium": potassium,
+                    "ph": ph,
+                    "organic_carbon": organic_carbon,
+                    "soil_type": SOIL_TYPE_ENCODING[soil_type],
+                    "farm_size": farm_size,
+                    "rainfall": rainfall,
+                    "avg_temperature": temperature,
+                    "avg_humidity": humidity,
+                    "crop": CROP_ENCODING[crop],
+                    "sowing_day_of_year": sowing_doy,
+                    "season": SEASON_ENCODING[season],
+                    "yield_tons_per_acre": target_yield,
+                }
+                record.update(encode_traits(crop))
+                records.append(record)
 
     return pd.DataFrame.from_records(records)
 

@@ -161,6 +161,8 @@ def prescribe_fertilizer(payload: FertilizerRequest):
                         "items": items,
                         "excess_nutrient_warnings": excess_nutrient_warnings,
                         "message": message,
+                        "sowing_date": payload.sowing_date.isoformat() if payload.sowing_date else None,
+                        "farming_method": payload.farming_method,
                     }
                 ),
             ),

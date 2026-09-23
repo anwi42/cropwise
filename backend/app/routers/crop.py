@@ -2,7 +2,7 @@ import psycopg2.extras
 from fastapi import APIRouter, HTTPException
 
 from app.crop_config import CROP_SEASONS, MARKET_RISK, SEASON_ENCODING
-from app.crop_model import predict_crop_probabilities
+from app.crop_model import predict_crop_fit_scores
 from app.database import get_db_cursor
 from app.schemas import CropRecommendRequest, CropRecommendResponse
 from app.soil_scoring import compute_soil_health
@@ -57,7 +57,7 @@ def recommend_crop(payload: CropRecommendRequest):
             )
 
         cur.execute(
-            "SELECT latitude, longitude FROM districts WHERE district_name = %s",
+            "SELECT latitude, longitude FROM districts WHERE LOWER(district_name) = LOWER(%s)",
             (farmer["district"],),
         )
         district_row = cur.fetchone()
@@ -84,7 +84,7 @@ def recommend_crop(payload: CropRecommendRequest):
             "organic_carbon": float(soil_report["organic_carbon"]),
         }
 
-        features = [
+        observed_features = [
             soil_values["nitrogen"],
             soil_values["phosphorus"],
             soil_values["potassium"],
@@ -94,16 +94,13 @@ def recommend_crop(payload: CropRecommendRequest):
             weather["rainfall_mm"],
             weather["avg_temperature_c"],
         ]
-        probabilities = predict_crop_probabilities(features)
 
-        season_crops = {
+        season_crops = [
             crop for crop, seasons in CROP_SEASONS.items() if payload.season in seasons
-        }
-        candidates = {
-            crop: prob for crop, prob in probabilities.items() if crop in season_crops
-        }
+        ]
+        candidates = predict_crop_fit_scores(observed_features, season_crops)
         if not candidates:
-            candidates = probabilities
+            candidates = predict_crop_fit_scores(observed_features, list(CROP_SEASONS.keys()))
 
         top_crops = sorted(candidates.items(), key=lambda item: item[1], reverse=True)[:3]
 

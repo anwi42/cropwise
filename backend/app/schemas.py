@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field, field_validator
 
 from app.config import SUPPORTED_LANGUAGES
 from app.crop_config import SUPPORTED_SEASONS
-from app.yield_config import CROP_LIST
+from app.yield_config import CROP_LIST, SOIL_TYPE_ENCODING
 
 PHONE_REGEX = re.compile(r"^[6-9]\d{9}$")
 VALID_INPUT_METHODS = {"manual", "ocr", "ocr_corrected"}
@@ -49,6 +49,16 @@ class RegisterRequest(BaseModel):
         if v is not None and v <= 0:
             raise ValueError("farm_size must be greater than 0")
         return v
+
+    @field_validator("soil_type")
+    @classmethod
+    def validate_soil_type(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return v
+        v_lower = v.strip().lower()
+        if v_lower not in SOIL_TYPE_ENCODING:
+            raise ValueError(f"soil_type must be one of {sorted(SOIL_TYPE_ENCODING)}")
+        return v_lower
 
 
 class RegisterResponse(BaseModel):
@@ -147,10 +157,16 @@ class SoilScoreResponse(BaseModel):
     nutrient_details: Dict[str, NutrientScoreDetail]
 
 
+SUPPORTED_BUDGETS = {"low", "medium", "high"}
+SUPPORTED_FARMING_METHODS = {"conventional", "organic", "mixed"}
+
+
 class CropRecommendRequest(BaseModel):
     farmer_id: int
     soil_report_id: int
     season: str
+    budget: Optional[str] = None
+    crop_preference: Optional[str] = Field(default=None, max_length=100)
 
     @field_validator("season")
     @classmethod
@@ -159,6 +175,24 @@ class CropRecommendRequest(BaseModel):
         if v_lower not in SUPPORTED_SEASONS:
             raise ValueError(f"season must be one of {SUPPORTED_SEASONS}")
         return v_lower
+
+    @field_validator("budget")
+    @classmethod
+    def validate_budget(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return v
+        v_lower = v.strip().lower()
+        if v_lower not in SUPPORTED_BUDGETS:
+            raise ValueError(f"budget must be one of {sorted(SUPPORTED_BUDGETS)}")
+        return v_lower
+
+    @field_validator("crop_preference")
+    @classmethod
+    def normalize_crop_preference(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return v
+        v_stripped = v.strip()
+        return v_stripped or None
 
 
 class WeatherInfo(BaseModel):
@@ -190,11 +224,23 @@ class FertilizerRequest(BaseModel):
     farmer_id: int
     soil_report_id: int
     selected_crop: str = Field(..., min_length=2, max_length=100)
+    sowing_date: Optional[date] = None
+    farming_method: Optional[str] = None
 
     @field_validator("selected_crop")
     @classmethod
     def normalize_crop(cls, v: str) -> str:
         return v.strip().lower()
+
+    @field_validator("farming_method")
+    @classmethod
+    def validate_farming_method(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return v
+        v_lower = v.strip().lower()
+        if v_lower not in SUPPORTED_FARMING_METHODS:
+            raise ValueError(f"farming_method must be one of {sorted(SUPPORTED_FARMING_METHODS)}")
+        return v_lower
 
 
 class FertilizerItem(BaseModel):

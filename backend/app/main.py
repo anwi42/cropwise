@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import alerts, auth, crop, fertilizer, soil, yield_prediction
 from app.weather_alerts import run_weather_alerts_job
@@ -28,6 +29,14 @@ app = FastAPI(
     description="AI-powered agricultural intelligence platform for Indian farmers",
     version="0.1.0",
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth.router)
