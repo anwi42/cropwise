@@ -8,6 +8,7 @@ import {
   Leaf,
   LogOut,
   Sprout,
+  TreeDeciduous,
   Wheat,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -20,6 +21,7 @@ const NAV_ITEMS = [
   { to: '/dashboard/crops', label: 'Crop Recommendation', icon: Wheat },
   { to: '/dashboard/fertilizer', label: 'Fertilizer Prescription', icon: FlaskConical },
   { to: '/dashboard/yield', label: 'Yield Prediction', icon: BarChart3 },
+  { to: '/dashboard/orchard', label: 'Orchard Advisory', icon: TreeDeciduous },
   { to: '/dashboard/alerts', label: 'Weather Alerts', icon: CloudSun },
 ]
 

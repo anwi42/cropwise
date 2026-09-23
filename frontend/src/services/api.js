@@ -20,6 +20,8 @@ export const getFertilizerPrescription = (data) => api.post('/api/soil/fertilize
 export const downloadFertilizerPDF = (prescriptionId) =>
   api.get(`/api/soil/fertilizer/${prescriptionId}/pdf`, { responseType: 'blob' })
 
+export const getOrchardAdvisory = (data) => api.post('/api/orchard/advisory', data)
+
 export const predictYield = (data) => api.post('/api/yield/predict', data)
 
 export const runWeatherCheck = () => api.post('/api/alerts/run-check')

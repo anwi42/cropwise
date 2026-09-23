@@ -1,4 +1,4 @@
-import { BarChart3, Bell, CalendarDays, CloudSun, FileText, FlaskConical, Sprout, Wheat } from 'lucide-react'
+import { BarChart3, Bell, CalendarDays, CloudSun, FileText, FlaskConical, Sprout, TreeDeciduous, Wheat } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Badge from '../../components/common/Badge'
@@ -38,6 +38,12 @@ const FEATURES = [
     icon: CloudSun,
     title: 'Weather Alerts',
     description: 'Stay ahead of dangerous weather patterns',
+  },
+  {
+    to: '/dashboard/orchard',
+    icon: TreeDeciduous,
+    title: 'Orchard Advisory',
+    description: 'Get monthly care calendar and advisory for your fruit trees',
   },
   {
     to: '/dashboard/fertilizer',

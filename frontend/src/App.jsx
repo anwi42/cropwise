@@ -11,6 +11,7 @@ import SoilTestPage from './pages/dashboard/SoilTestPage'
 import CropRecommendPage from './pages/dashboard/CropRecommendPage'
 import FertilizerPage from './pages/dashboard/FertilizerPage'
 import YieldPage from './pages/dashboard/YieldPage'
+import OrchardAdvisoryPage from './pages/dashboard/OrchardAdvisoryPage'
 import AlertsPage from './pages/dashboard/AlertsPage'
 
 function ProtectedRoute({ children }) {
@@ -39,6 +40,7 @@ function AppRoutes() {
         <Route path="crops" element={<CropRecommendPage />} />
         <Route path="fertilizer" element={<FertilizerPage />} />
         <Route path="yield" element={<YieldPage />} />
+        <Route path="orchard" element={<OrchardAdvisoryPage />} />
         <Route path="alerts" element={<AlertsPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

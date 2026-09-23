@@ -133,6 +133,22 @@ export const NUTRIENT_LABELS = {
   organic_carbon: 'Organic Carbon',
 }
 
+// Mirrors backend/app/orchard_config.py's ORCHARD_TREE_LIST/TREE_LABELS.
+export const TREE_LABELS = {
+  mango: 'Mango',
+  banana: 'Banana',
+  papaya: 'Papaya',
+  guava: 'Guava',
+  pomegranate: 'Pomegranate',
+  citrus: 'Citrus (Orange/Lemon)',
+  grapes: 'Grapes',
+  coconut: 'Coconut',
+}
+
+export const TREE_OPTIONS = Object.entries(TREE_LABELS)
+  .map(([value, label]) => ({ value, label }))
+  .sort((a, b) => a.label.localeCompare(b.label))
+
 // Mirrors the alert_type strings weather_alerts.py writes to the database.
 export const ALERT_TYPE_META = {
   excess_rain_flowering: { label: 'Excess Rain', icon: 'CloudRain' },

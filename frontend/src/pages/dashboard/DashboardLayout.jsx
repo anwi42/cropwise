@@ -8,6 +8,7 @@ const PAGE_TITLES = {
   '/dashboard/crops': 'Crop Recommendation',
   '/dashboard/fertilizer': 'Fertilizer Prescription',
   '/dashboard/yield': 'Yield Prediction',
+  '/dashboard/orchard': 'Orchard Advisory',
   '/dashboard/alerts': 'Weather Alerts',
 }
 

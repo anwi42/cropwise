@@ -80,7 +80,16 @@
       "Bash(../backend/venv/Scripts/python.exe -c ' *)",
       "Bash(backend/venv/Scripts/python.exe ml_training/seed_new_crop_data.py)",
       "Bash(venv/Scripts/python.exe -c \"import lightgbm; print\\(lightgbm.__version__\\)\")",
-      "Bash(node -e ' *)"
+      "Bash(node -e ' *)",
+      "Bash(where pg_config)",
+      "Bash(./venv/Scripts/python.exe -c \"from app.main import app; print\\('OK', [r.path for r in app.routes if 'orchard' in r.path]\\)\")",
+      "Bash(node -e \"const icons = require\\('lucide-react'\\); console.log\\(typeof icons.TreeDeciduous\\);\")",
+      "Read(//tmp/**)",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\([p for p in d['paths'] if 'orchard' in p]\\)\")",
+      "Bash(PGPASSWORD='PLACEMENTIN26' \"/c/Program Files/PostgreSQL/18/bin/psql.exe\" -h localhost -p 5432 -U postgres -d agriplatform -c \"SELECT * FROM orchard_crops;\")",
+      "Bash(tasklist)",
+      "Bash(npx oxlint *)",
+      "Bash(echo \"EXIT:$?\")"
     ]
   }
 }

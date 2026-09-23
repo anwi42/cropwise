@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field, field_validator
 
 from app.config import SUPPORTED_LANGUAGES
 from app.crop_config import SUPPORTED_SEASONS
+from app.orchard_config import ORCHARD_TREE_LIST
 from app.yield_config import CROP_LIST, SOIL_TYPE_ENCODING
 
 PHONE_REGEX = re.compile(r"^[6-9]\d{9}$")
@@ -263,6 +264,50 @@ class FertilizerResponse(BaseModel):
     excess_nutrient_warnings: List[str]
     message: str
     pdf_download_url: str
+
+
+class OrchardAdvisoryRequest(BaseModel):
+    farmer_id: int
+    tree_type: str
+    variety: Optional[str] = Field(default=None, max_length=100)
+    planting_date: date
+    tree_count: Optional[int] = Field(default=None, gt=0)
+    area_acres: Optional[float] = Field(default=None, gt=0)
+
+    @field_validator("tree_type")
+    @classmethod
+    def validate_tree_type(cls, v: str) -> str:
+        v_lower = v.strip().lower()
+        if v_lower not in ORCHARD_TREE_LIST:
+            raise ValueError(f"tree_type must be one of {ORCHARD_TREE_LIST}")
+        return v_lower
+
+    @field_validator("planting_date")
+    @classmethod
+    def validate_planting_date(cls, v: date) -> date:
+        if v > date.today():
+            raise ValueError("planting_date cannot be in the future")
+        return v
+
+
+class OrchardCareItem(BaseModel):
+    irrigation: str
+    pruning: str
+    fertigation: str
+    pest_watch: str
+
+
+class OrchardAdvisoryResponse(BaseModel):
+    success: bool
+    orchard_crop_id: int
+    tree_type: str
+    variety: Optional[str] = None
+    growth_stage: str
+    years_since_planting: float
+    weather: WeatherInfo
+    care: OrchardCareItem
+    weather_warnings: List[str]
+    message: str
 
 
 class YieldPredictRequest(BaseModel):

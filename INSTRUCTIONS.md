@@ -206,6 +206,20 @@ CREATE TABLE agri_glossary (
 );
 ```
 
+### orchard_crops table
+```sql
+CREATE TABLE orchard_crops (
+    id SERIAL PRIMARY KEY,
+    farmer_id INTEGER REFERENCES farmers(id),
+    tree_type VARCHAR(50) NOT NULL,
+    variety VARCHAR(100),
+    planting_date DATE NOT NULL,
+    tree_count INTEGER,
+    area_acres DECIMAL(10,2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
 ---
 
 ## Features To Build — Farmer Module
