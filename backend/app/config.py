@@ -9,6 +9,8 @@ DB_NAME = os.getenv("DB_NAME", "agriplatform")
 DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "")
 
+FRONTEND_BASE_URL = os.getenv("FRONTEND_BASE_URL", "http://localhost:5173")
+
 SUPPORTED_LANGUAGES = [
     "english",
     "hindi",

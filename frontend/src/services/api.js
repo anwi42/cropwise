@@ -7,6 +7,25 @@ const api = axios.create({
 export const registerFarmer = (data) => api.post('/api/register', data)
 export const loginFarmer = (data) => api.post('/api/login', data)
 
+export const registerBankOfficer = (data) => api.post('/api/bank/register', data)
+export const loginBankOfficer = (data) => api.post('/api/bank/login', data)
+
+export const searchBankFarmer = (phone) => api.get('/api/bank/farmer/search', { params: { phone } })
+export const getBankFarmerProfile = (farmerId, officerId) =>
+  api.get(`/api/bank/farmer/${farmerId}`, { params: officerId ? { bank_officer_id: officerId } : {} })
+
+export const generateCertificate = (data) => api.post('/api/bank/certificate/generate', data)
+export const downloadCertificatePDF = (certificateId) =>
+  api.get(`/api/bank/certificate/${certificateId}/pdf`, { responseType: 'blob' })
+export const verifyCertificate = (code) => api.get(`/api/bank/certificate/verify/${code}`)
+
+export const calculateLoanScore = (data) => api.post('/api/bank/loan/score', data)
+
+export const verifyClaim = (data) => api.post('/api/bank/claim/verify', data)
+
+export const getBankPortfolio = (officerId) => api.get(`/api/bank/portfolio/${officerId}`)
+export const getBankOverview = (officerId) => api.get(`/api/bank/overview/${officerId}`)
+
 export const uploadSoilOCR = (formData) =>
   api.post('/api/soil/ocr', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },

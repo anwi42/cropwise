@@ -90,6 +90,243 @@ class LoginResponse(BaseModel):
     preferred_language: Optional[str] = None
 
 
+class BankRegisterRequest(BaseModel):
+    name: str = Field(..., min_length=2, max_length=100)
+    phone: str
+    password: str = Field(..., min_length=6, max_length=72)
+    organization: Optional[str] = None
+
+    @field_validator("phone")
+    @classmethod
+    def validate_phone(cls, v: str) -> str:
+        if not PHONE_REGEX.match(v):
+            raise ValueError(
+                "phone must be a valid 10-digit Indian mobile number starting with 6-9"
+            )
+        return v
+
+
+class BankRegisterResponse(BaseModel):
+    success: bool
+    message: str
+    officer_id: int
+
+
+class BankLoginRequest(BaseModel):
+    phone: str
+    password: str
+
+    @field_validator("phone")
+    @classmethod
+    def validate_phone(cls, v: str) -> str:
+        if not PHONE_REGEX.match(v):
+            raise ValueError(
+                "phone must be a valid 10-digit Indian mobile number starting with 6-9"
+            )
+        return v
+
+
+class BankLoginResponse(BaseModel):
+    success: bool
+    message: str
+    officer_id: Optional[int] = None
+    name: Optional[str] = None
+    organization: Optional[str] = None
+
+
+class BankFarmerSearchResponse(BaseModel):
+    success: bool
+    farmer_id: int
+    name: str
+    phone: str
+    village: Optional[str] = None
+    district: Optional[str] = None
+    state: Optional[str] = None
+
+
+class BankSoilReportItem(BaseModel):
+    id: int
+    nitrogen: Optional[float] = None
+    phosphorus: Optional[float] = None
+    potassium: Optional[float] = None
+    ph: Optional[float] = None
+    organic_carbon: Optional[float] = None
+    health_score: Optional[int] = None
+    health_zone: Optional[str] = None
+    report_date: date
+
+
+class BankYieldPredictionItem(BaseModel):
+    id: int
+    crop_type: str
+    crop_variety: Optional[str] = None
+    sowing_date: date
+    predicted_yield_min: Optional[float] = None
+    predicted_yield_max: Optional[float] = None
+    confidence_score: Optional[float] = None
+    created_at: datetime
+
+
+class BankWeatherAlertItem(BaseModel):
+    id: int
+    alert_type: str
+    alert_message: str
+    created_at: datetime
+
+
+class BankFarmerProfileResponse(BaseModel):
+    success: bool
+    farmer_id: int
+    name: str
+    phone: str
+    village: Optional[str] = None
+    taluka: Optional[str] = None
+    district: Optional[str] = None
+    state: Optional[str] = None
+    farm_size: Optional[float] = None
+    soil_type: Optional[str] = None
+    water_source: Optional[str] = None
+    crops_grown_before: Optional[List[str]] = None
+    latest_soil_report: Optional[BankSoilReportItem] = None
+    latest_yield_prediction: Optional[BankYieldPredictionItem] = None
+    yield_prediction_history: List[BankYieldPredictionItem] = Field(default_factory=list)
+    weather_alerts_history: List[BankWeatherAlertItem] = Field(default_factory=list)
+
+
+class CertificateGenerateRequest(BaseModel):
+    bank_officer_id: int
+    farmer_id: int
+
+
+class CertificateGenerateResponse(BaseModel):
+    success: bool
+    certificate_id: int
+    verification_code: str
+    document_hash: str
+    pdf_download_url: str
+
+
+class CertificateVerifyResponse(BaseModel):
+    success: bool
+    status: str
+    certificate_id: int
+    farmer_name: str
+    village: Optional[str] = None
+    district: Optional[str] = None
+    state: Optional[str] = None
+    crop_type: str
+    predicted_yield_min: float
+    predicted_yield_max: float
+    confidence_score: float
+    soil_health_score: Optional[int] = None
+    document_hash: str
+    verification_code: str
+    generated_at: datetime
+    bank_officer_name: str
+
+
+class LoanScoreRequest(BaseModel):
+    bank_officer_id: int
+    farmer_id: int
+
+
+class LoanScoreBreakdownItem(BaseModel):
+    category: str
+    points_earned: int
+    max_points: int
+    reason: str
+
+
+class LoanScoreResponse(BaseModel):
+    success: bool
+    farmer_id: int
+    total_score: int
+    risk_level: str
+    breakdown: List[LoanScoreBreakdownItem]
+    recommended_loan_min: float
+    recommended_loan_max: float
+
+
+CLAIM_REASONS = {"flood", "drought", "frost", "pest", "hailstorm", "fire"}
+
+
+class ClaimVerifyRequest(BaseModel):
+    bank_officer_id: int
+    farmer_id: int
+    claim_date: date
+    claimed_loss_amount: float = Field(..., ge=0)
+    claimed_reason: str
+
+    @field_validator("claimed_reason")
+    @classmethod
+    def validate_claimed_reason(cls, v: str) -> str:
+        v_lower = v.strip().lower()
+        if v_lower not in CLAIM_REASONS:
+            raise ValueError(f"claimed_reason must be one of {sorted(CLAIM_REASONS)}")
+        return v_lower
+
+
+class ClaimWeatherData(BaseModel):
+    date: Optional[str] = None
+    rainfall_mm: Optional[float] = None
+    temp_max_c: Optional[float] = None
+    temp_min_c: Optional[float] = None
+    temp_mean_c: Optional[float] = None
+    warning: Optional[str] = None
+
+
+class ClaimYieldData(BaseModel):
+    crop_type: str
+    crop_variety: Optional[str] = None
+    sowing_date: date
+    predicted_yield_min: float
+    predicted_yield_max: float
+    confidence_score: float
+
+
+class ClaimVerifyResponse(BaseModel):
+    success: bool
+    claim_verification_id: int
+    verification_result: str
+    explanation: str
+    weather_data: ClaimWeatherData
+    yield_data: Optional[ClaimYieldData] = None
+
+
+class PortfolioFarmerItem(BaseModel):
+    farmer_id: int
+    name: str
+    district: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    crop_type: Optional[str] = None
+    soil_health_score: Optional[int] = None
+    soil_health_zone: Optional[str] = None
+    active_weather_alerts: int
+    predicted_yield_min: Optional[float] = None
+    predicted_yield_max: Optional[float] = None
+    risk_level: str
+
+
+class PortfolioResponse(BaseModel):
+    success: bool
+    officer_id: int
+    total_farmers: int
+    low_risk_count: int
+    medium_risk_count: int
+    high_risk_count: int
+    farmers: List[PortfolioFarmerItem]
+
+
+class BankOverviewResponse(BaseModel):
+    success: bool
+    officer_id: int
+    total_farmers_verified: int
+    certificates_today: int
+    high_risk_farmers: int
+    pending_claim_verifications: int
+
+
 class SoilFieldExtraction(BaseModel):
     value: Optional[float]
     confidence: float

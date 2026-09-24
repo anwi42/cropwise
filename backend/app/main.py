@@ -5,7 +5,7 @@ from apscheduler.triggers.cron import CronTrigger
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import alerts, auth, crop, fertilizer, orchard, soil, yield_prediction
+from app.routers import alerts, auth, bank, crop, fertilizer, orchard, soil, yield_prediction
 from app.weather_alerts import run_weather_alerts_job
 
 scheduler = BackgroundScheduler(timezone="Asia/Kolkata")
@@ -40,6 +40,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(bank.router)
 app.include_router(soil.router)
 app.include_router(crop.router)
 app.include_router(fertilizer.router)

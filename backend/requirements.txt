@@ -51,6 +51,7 @@ python-dateutil==2.9.0.post0
 python-dotenv==1.2.3
 python-multipart==0.0.32
 PyYAML==6.0.3
+qrcode==8.2
 reportlab==5.0.1
 requests==2.34.2
 scikit-image==0.26.0

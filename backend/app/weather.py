@@ -174,6 +174,34 @@ def fetch_daily_forecast_series(latitude: float, longitude: float, days: int = 1
     }
 
 
+def fetch_historical_weather_for_date(latitude: float, longitude: float, target_date: date) -> dict:
+    response = requests.get(
+        OPEN_METEO_ARCHIVE_URL,
+        params={
+            "latitude": latitude,
+            "longitude": longitude,
+            "start_date": target_date.isoformat(),
+            "end_date": target_date.isoformat(),
+            "daily": "precipitation_sum,temperature_2m_max,temperature_2m_min,temperature_2m_mean",
+            "timezone": "auto",
+        },
+        timeout=REQUEST_TIMEOUT_SECONDS,
+    )
+    response.raise_for_status()
+    daily = response.json()["daily"]
+
+    if not daily["time"]:
+        raise ValueError(f"No weather data available for {target_date.isoformat()}")
+
+    return {
+        "date": daily["time"][0],
+        "rainfall_mm": daily["precipitation_sum"][0] if daily["precipitation_sum"][0] is not None else 0.0,
+        "temp_max_c": daily["temperature_2m_max"][0],
+        "temp_min_c": daily["temperature_2m_min"][0],
+        "temp_mean_c": daily["temperature_2m_mean"][0],
+    }
+
+
 def fetch_yield_weather(latitude: float, longitude: float, season: str) -> dict:
     timestamp = datetime.now(timezone.utc).isoformat()
 
